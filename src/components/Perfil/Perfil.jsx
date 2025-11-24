@@ -1,28 +1,80 @@
-import React, { useState } from "react";
-import "./perfil.css";
+import React, { useState, useEffect, useRef } from "react";
+
+import "../Home/Home"
 
 export default function Perfil() {
-  // Estados que substituem os inputs e displays
+
+  // -------------------------------
+  // STATES DO PERFIL
+  // -------------------------------
+  const [user, setUser] = useState({
+    nome: "Nome",
+    papel: "Aluno",
+    cidade: "Cidade",
+    email: "Email",
+    telefone: "(00) 00000-0000",
+    tipo_usuario: "Aluno",
+    cursosFavoritos: ["Nenhum curso"],
+  });
+
+  // Inputs controlados
   const [isEditing, setIsEditing] = useState(false);
-
-  const [name, setName] = useState("Seu nome");
-  const [role, setRole] = useState("Estudante");
-  const [location, setLocation] = useState("Localização");
-  const [email, setEmail] = useState("email@exemplo.com");
-  const [phone, setPhone] = useState("(00) 00000-0000");
-
   const [favOpen, setFavOpen] = useState(false);
-  const [favCourses, setFavCourses] = useState([]);
-  const [courseInput, setCourseInput] = useState("");
 
+  // Sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const tooltipRef = useRef();
+
+  // ---------------------------------------
+  // 🔵 CARREGAR PERFIL DO BACKEND AUTOMATICAMENTE
+  // ---------------------------------------
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetch("http://localhost:3000/api/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Token inválido");
+        return res.json();
+      })
+      .then((data) => {
+        setUser((prev) => ({
+          ...prev,
+          ...data
+        }));
+      })
+      .catch(() => {});
+  }, []);
+
+  // ---------------------------------------
+  // 🟣 FECHAR TOOLTIP AO CLICAR FORA
+  // ---------------------------------------
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target)
+      ) {
+        setFavOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ---------------------------------------
+  // SALVAR ALTERAÇÕES
+  // ---------------------------------------
   function handleSave() {
-    setFavCourses(courseInput.split("\n").filter((item) => item.trim() !== ""));
     setIsEditing(false);
   }
 
   return (
     <>
-      {/* MENU SUPERIOR */}
+      {/* ----------- MENU SUPERIOR ----------- */}
       <header className="topbar">
         <div className="logo">Ensino de Chinelo</div>
         <div className="login-btn">
@@ -30,86 +82,84 @@ export default function Perfil() {
         </div>
       </header>
 
-      {/* MENU LATERAL */}
+
+      {/* ----------- SIDEBAR ----------- */}
       <div className="sidebar-wrapper">
-        <div className="sidebar">
-          <a href="/index" className="nav-link">
-            <i className="fas fa-home"></i><span> Início</span>
-          </a>
-          <a href="/perfil" className="nav-link">
-            <i className="fas fa-user"></i><span> Perfil</span>
-          </a>
-          <a href="#" className="nav-link">
-            <i className="fas fa-cog"></i><span> Configurações</span>
-          </a>
-          <a href="/sobre" className="nav-link">
-            <i className="fas fa-info-circle"></i><span> Sobre nós</span>
-          </a>
+        <div className={`sidebar ${sidebarOpen ? "expanded" : ""}`}>
+          <a href="/" className="nav-link"><i className="fas fa-home"></i><span> Início</span></a>
+          <a href="/perfil" className="nav-link"><i className="fas fa-user"></i><span> Perfil</span></a>
+          <a href="#" className="nav-link"><i className="fas fa-cog"></i><span> Configurações</span></a>
+          <a href="/sobre" className="nav-link"><i className="fas fa-info-circle"></i><span> Sobre nós</span></a>
         </div>
 
-        <button className="toggle-btn">☰</button>
+        <button className="toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          ☰
+        </button>
       </div>
 
-      {/* CARD DE PERFIL */}
+
+      {/* ----------- CARD DE PERFIL ----------- */}
       <div className="container">
         <div className="card">
           <img
             src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
-            alt="Imagem de Perfil Padrão"
+            alt="Foto de Perfil"
           />
 
           {/* Nome */}
           {!isEditing ? (
-            <h2>{name}</h2>
+            <h2>{user.nome}</h2>
           ) : (
             <input
-              type="text"
-              value={name}
-              className="edit-input"
-              onChange={(e) => setName(e.target.value)}
+              value={user.nome}
+              onChange={(e) =>
+                setUser({ ...user, nome: e.target.value })
+              }
             />
           )}
 
           <div className="info">
-
-            {/* Cargo */}
+            {/* Papel */}
             <p>
               <i className="fas fa-user-graduate"></i>{" "}
               {!isEditing ? (
-                <span>{role}</span>
+                <span>{user.tipo_usuario}</span>
               ) : (
                 <input
-                  type="text"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={user.tipo_usuario}
+                  onChange={(e) =>
+                    setUser({ ...user, tipo_usuario: e.target.value })
+                  }
                 />
               )}
             </p>
 
-            {/* Localização */}
+            {/* Cidade */}
             <p>
               <i className="fas fa-map-marker-alt"></i>{" "}
               {!isEditing ? (
-                <span>{location}</span>
+                <span>{user.cidade}</span>
               ) : (
                 <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  value={user.cidade}
+                  onChange={(e) =>
+                    setUser({ ...user, cidade: e.target.value })
+                  }
                 />
               )}
             </p>
 
-            {/* E-mail */}
+            {/* Email */}
             <p>
               <i className="fas fa-envelope"></i>{" "}
               {!isEditing ? (
-                <span>{email}</span>
+                <span>{user.email}</span>
               ) : (
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={user.email}
+                  onChange={(e) =>
+                    setUser({ ...user, email: e.target.value })
+                  }
                 />
               )}
             </p>
@@ -118,12 +168,13 @@ export default function Perfil() {
             <p>
               <i className="fas fa-phone"></i>{" "}
               {!isEditing ? (
-                <span>{phone}</span>
+                <span>{user.telefone}</span>
               ) : (
                 <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={user.telefone}
+                  onChange={(e) =>
+                    setUser({ ...user, telefone: e.target.value })
+                  }
                 />
               )}
             </p>
@@ -136,46 +187,53 @@ export default function Perfil() {
             </button>
           )}
 
-          {/* Ícones */}
+          {/* -------- ICONES -------- */}
           <div className="icons">
             <i
               className="fas fa-pencil-alt"
-              title="Editar perfil"
+              title="Editar"
               onClick={() => setIsEditing(!isEditing)}
             ></i>
 
-            <i className="fas fa-share-alt" title="Compartilhar"></i>
+            <i className="fas fa-share-alt"></i>
 
+            {/* Favoritos */}
             <div className="fav">
               <i
                 className="fas fa-heart"
-                id="favBtn"
-                title="Cursos Favoritos"
+                title="Cursos favoritos"
                 onClick={() => setFavOpen(true)}
               ></i>
 
-              {/* Tooltip favoritos */}
               {favOpen && (
-                <div className="tooltip">
-                  <span className="close-btn" onClick={() => setFavOpen(false)}>
+                <div className="tooltipFav show" ref={tooltipRef}>
+                  <span
+                    className="close-btn"
+                    onClick={() => setFavOpen(false)}
+                  >
                     &times;
                   </span>
 
-                  <strong>Cursos Favoritos:</strong>
-
+                  <strong>Cursos Favoritos</strong>
                   <ul>
-                    {favCourses.length === 0 && <li>Nenhum curso salvo.</li>}
-                    {favCourses.map((c, i) => (
+                    {user.cursosFavoritos.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}
                   </ul>
 
-                  <textarea
-                    rows="4"
-                    placeholder="Digite cursos favoritos separados por linha..."
-                    value={courseInput}
-                    onChange={(e) => setCourseInput(e.target.value)}
-                  ></textarea>
+                  {isEditing && (
+                    <textarea
+                      value={user.cursosFavoritos.join("\n")}
+                      onChange={(e) =>
+                        setUser({
+                          ...user,
+                          cursosFavoritos: e.target.value
+                            .split("\n")
+                            .filter((c) => c.trim() !== "")
+                        })
+                      }
+                    />
+                  )}
                 </div>
               )}
             </div>

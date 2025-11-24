@@ -42,10 +42,6 @@
     transition: background-color 0.3s, color 0.3s;
   }
   
-  .topbar .login-btn:hover {
-    background-color: #915cd3;
-    color: #fff;
-  }
   
   .sidebar-wrapper {
     position: relative;
@@ -54,7 +50,7 @@
   .sidebar {
     width: 60px;
     transition: width 0.3s;
-    height: 100vh;
+    height: calc(100vh - 60px);
     background-color: #9333EA;
     position: fixed;
     top: 60px;
@@ -87,7 +83,6 @@
   
   .sidebar .nav-link:hover {
     background-color: #8c5edc;
-    text-decoration: none;
   }
   
   .sidebar .nav-link span {
@@ -98,6 +93,7 @@
     display: inline;
   }
   
+  /* Botão de expandir a sidebar */
   .toggle-btn {
     position: fixed;
     top: 70px;
@@ -110,27 +106,15 @@
     padding: 5px 10px;
     cursor: pointer;
     transition: left 0.3s;
-    color: #9333EA
+    color: #9333EA;
   }
   
   .sidebar.expanded ~ .toggle-btn {
     left: 210px;
   }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
   
-  .botao {
-    margin-left: 150px;
-    margin-top: 100px;
-  }
-  
-  .btn-roxo {
-    background-color: #a678e2;
-    color: white;
-    border: none;
-    font-weight: bold;
-  }
-  
-  .btn-roxo:hover {
-    background-color: #915cd3;
-    color: white;
-  }
   

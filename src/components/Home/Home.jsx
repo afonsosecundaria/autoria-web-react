@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "../Home/Home.css";
+import "../Perfil/Perfil"
+import "../Login/Login"
+import "../Cadastro/Cadastro"
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -90,7 +92,7 @@ export default function Home() {
       {/* MENU LATERAL + BOTÃO */}
       <div className="sidebar-wrapper">
         <div className={`sidebar ${sidebarOpen ? "expanded" : ""}`}>
-          <a href="/index" className="nav-link">
+          <a href="/" className="nav-link">
             <i className="fas fa-home"></i> <span>Início</span>
           </a>
           <a href="/perfil" className="nav-link">

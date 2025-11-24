@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./cadastro.css";
 
 export default function Cadastro() {
   // Estados do formulário

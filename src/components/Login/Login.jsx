@@ -1,7 +1,7 @@
 // src/components/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../Login/Login.css';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +24,7 @@ const Login = () => {
       }
 
       localStorage.setItem('token', data.token);
-      navigate('/perfil'); // redireciona para página perfil
+      navigate('/perfil');
     } catch (err) {
       alert(err.message);
       console.error('Erro:', err);
@@ -32,36 +32,67 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
-      <h2><i className="fas fa-sign-in-alt"></i> Entrar</h2>
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input 
-            type="email" 
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="senha">Senha</label>
-          <input 
-            type="password" 
-            id="senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required 
-          />
-        </div>
-        <div className="form-link">
-          <a href="/cadastro">Ainda não possui conta? <strong>Cadastre-se</strong></a>
-        </div>
-        <div className="form-group">
-          <button type="submit">Entrar</button>
-        </div>
-      </form>
+    <div className="min-h-screen flex items-center justify-center px-4">
+
+      <div className="bg-white/70 backdrop-blur-lg p-10 rounded-2xl shadow-xl w-full max-w-md">
+        
+        <h2 className="text-3xl font-bold text-center text-purple-700 mb-8 flex items-center justify-center gap-2">
+          <i className="fas fa-sign-in-alt text-purple-600"></i> 
+          Entrar
+        </h2>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+
+          {/* EMAIL */}
+          <div>
+            <label htmlFor="email" className="block font-semibold text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* SENHA */}
+          <div>
+            <label htmlFor="senha" className="block font-semibold text-gray-700 mb-1">
+              Senha
+            </label>
+            <input
+              type="password"
+              id="senha"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* LINK */}
+          <div className="text-sm text-center">
+            <a
+              href="/cadastro"
+              className="text-purple-700 hover:underline"
+            >
+              Ainda não possui conta? <strong>Cadastre-se</strong>
+            </a>
+          </div>
+
+          {/* BOTÃO */}
+          <button
+            type="submit"
+            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition"
+          >
+            Entrar
+          </button>
+
+        </form>
+      </div>
     </div>
   );
 };
