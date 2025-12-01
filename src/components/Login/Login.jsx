@@ -1,96 +1,135 @@
-// src/components/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha })
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Falha no login');
-      }
+      if (!res.ok) throw new Error(data.error || "Falha no login");
 
-      localStorage.setItem('token', data.token);
-      navigate('/perfil');
+      localStorage.setItem("token", data.token);
+      navigate("/perfil");
     } catch (err) {
       alert(err.message);
-      console.error('Erro:', err);
+      console.error("Erro:", err);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+  // Estilos inline
+  const styles = {
+    page: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #cbb4e3, #e1c5ff)",
+      fontFamily: "Segoe UI, sans-serif",
+    },
+    card: {
+      backgroundColor: "#fff",
+      padding: "2.5rem",
+      borderRadius: "12px",
+      boxShadow: "0 8px 20px rgba(0, 0, 0, 0.15)",
+      width: "100%",
+      maxWidth: "400px",
+    },
+    title: {
+      textAlign: "center",
+      color: "#a678e2",
+      marginBottom: "1.5rem",
+      fontWeight: "bold",
+      fontSize: "1.8rem",
+    },
+    formGroup: {
+      marginBottom: "1.2rem",
+    },
+    label: {
+      display: "block",
+      marginBottom: "0.5rem",
+      fontWeight: 600,
+      color: "#333",
+    },
+    input: {
+      width: "100%",
+      padding: "0.75rem",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      boxSizing: "border-box",
+    },
+    button: {
+      width: "100%",
+      padding: "0.75rem",
+      backgroundColor: "#a678e2",
+      color: "#fff",
+      border: "none",
+      borderRadius: "8px",
+      fontSize: "1rem",
+      fontWeight: "bold",
+      cursor: "pointer",
+      marginTop: "1rem",
+    },
+    linkBox: {
+      textAlign: "center",
+      marginBottom: "1rem",
+      marginTop: "0.5rem",
+    },
+    link: {
+      color: "#6a1b9a",
+      textDecoration: "none",
+    },
+  };
 
-      <div className="bg-white/70 backdrop-blur-lg p-10 rounded-2xl shadow-xl w-full max-w-md">
-        
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-8 flex items-center justify-center gap-2">
-          <i className="fas fa-sign-in-alt text-purple-600"></i> 
-          Entrar
+  return (
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>
+          <i className="fas fa-sign-in-alt"></i> Entrar
         </h2>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-
-          {/* EMAIL */}
-          <div>
-            <label htmlFor="email" className="block font-semibold text-gray-700 mb-1">
-              Email
-            </label>
+        <form onSubmit={handleLogin}>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Email</label>
             <input
               type="email"
-              id="email"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              style={styles.input}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          {/* SENHA */}
-          <div>
-            <label htmlFor="senha" className="block font-semibold text-gray-700 mb-1">
-              Senha
-            </label>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Senha</label>
             <input
               type="password"
-              id="senha"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              style={styles.input}
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               required
             />
           </div>
 
-          {/* LINK */}
-          <div className="text-sm text-center">
-            <a
-              href="/cadastro"
-              className="text-purple-700 hover:underline"
-            >
+          <div style={styles.linkBox}>
+            <a href="/cadastro" style={styles.link}>
               Ainda não possui conta? <strong>Cadastre-se</strong>
             </a>
           </div>
 
-          {/* BOTÃO */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition"
-          >
+          <button type="submit" style={styles.button}>
             Entrar
           </button>
-
         </form>
       </div>
     </div>
