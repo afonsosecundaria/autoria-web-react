@@ -1,0 +1,131 @@
+/* TOPO */
+.topbar {
+  height: 60px;
+  background: #ec3df8;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.topbarLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.topbarNotification {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: #f3f3f3;
+  padding: 20px;
+}
+
+.sidebarItem {
+  display: block;
+  color: #333;
+  text-decoration: none;
+  margin-bottom: 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sidebarItem:hover {
+  font-weight: bold;
+}
+
+/* CONTEÚDO */
+.content {
+  flex: 1;
+  background: #eee;
+}
+
+/* BANNER PERFIL */
+.profileBanner {
+  background: #7c3aed;
+  height: 180px;
+  padding: 30px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: white;
+  color: #7c3aed;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 28px;
+}
+
+.userText p {
+  margin-bottom: 5px;
+}
+
+.userText h2 {
+  font-weight: normal;
+}
+
+.changePhoto {
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ILUSTRAÇÃO */
+.profileIllustration {
+  font-size: 80px;
+}
+
+/* ABAS */
+.profileTabs {
+  background: white;
+  display: flex;
+  gap: 30px;
+  padding: 15px 30px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  cursor: pointer;
+  color: #555;
+}
+
+.tabActive {
+  font-weight: bold;
+  border-bottom: 2px solid black;
+  padding-bottom: 5px;
+  color: black;
+}
+
+/* CONTEÚDO VAZIO */
+.profileContent {
+  height: calc(100vh - 180px - 60px);
+  background: #f2f2f2;
+}
