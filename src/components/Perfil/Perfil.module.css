@@ -129,3 +129,42 @@
   height: calc(100vh - 180px - 60px);
   background: #f2f2f2;
 }
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+.card input,
+.card textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+}
+
+.card button {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cardDanger {
+  background: #fee2e2;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+}
+
+.dangerButton {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px;
+}
+
