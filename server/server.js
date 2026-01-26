@@ -13,9 +13,9 @@ const JWT_SECRET = 'seuSegredoSuperSecreto';
 
 
 const db = mysql.createPool({
-  host: "localhost",
+  host: "trolley.proxy.rlwy.net",
   user: "root",
-  password: "",
+  password: "XLerpJtDItzHQDJFjmigxCTKkEtqfLdH",
   database: "cursos_online",
 });
 
