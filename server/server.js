@@ -62,11 +62,9 @@ function autenticarJWT(req, res, next) {
 }
 
 app.post('/api/cadastro', async (req, res) => {
-  const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
+  console.log("DADOS RECEBIDOS:", req.body);
 
-  if (!nome || !sobrenome || !email || !telefone || !senha || !tipo_usuario) {
-    return res.status(400).json({ error: "Todos os campos são obrigatórios." });
-  }
+  const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
 
   try {
     const senhaHash = await bcrypt.hash(senha, 10);
@@ -79,20 +77,21 @@ app.post('/api/cadastro', async (req, res) => {
     db.query(sql, [nome, sobrenome, email, telefone, senhaHash, tipo_usuario], (err) => {
       if (err) {
         console.error("ERRO MYSQL:", err);
-          return res.status(500).json({ 
-            error: "Erro ao cadastrar usuário.",
-            detalhe: err.sqlMessage
-          });
+        return res.status(500).json({ 
+          error: "Erro ao cadastrar usuário.",
+          detalhe: err.sqlMessage
+        });
       }
-
 
       res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
     });
 
   } catch (err) {
+    console.error("ERRO GERAL:", err);
     res.status(500).json({ error: "Erro interno no servidor." });
   }
 });
+
 
 
 app.post('/api/login', (req, res) => {
