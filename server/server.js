@@ -16,8 +16,7 @@ const db = mysql.createPool({
   host: "trolley.proxy.rlwy.net",
   user: "root",
   password: "XLerpJtDItzHQDJFjmigxCTKkEtqfLdH",
-  // database: "cursos_online",
-  database: "railway",
+  database: "cursos_online",
   port: 13120
 });
 
@@ -79,9 +78,13 @@ app.post('/api/cadastro', async (req, res) => {
 
     db.query(sql, [nome, sobrenome, email, telefone, senhaHash, tipo_usuario], (err) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Erro ao cadastrar usuário." });
+        console.error("ERRO MYSQL:", err);
+          return res.status(500).json({ 
+            error: "Erro ao cadastrar usuário.",
+            detalhe: err.sqlMessage
+          });
       }
+
 
       res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
     });
