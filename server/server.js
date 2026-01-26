@@ -7,9 +7,12 @@ const cors = require("cors");
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// 🔥 PORTA CORRETA PRA PRODUÇÃO
+const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET || 'seuSegredoSuperSecreto';
 
+// 🔥 BANCO COM TRATAMENTO DE ERRO
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -19,10 +22,21 @@ const db = mysql.createPool({
   ssl: { rejectUnauthorized: false }
 });
 
+// Testa conexão com banco
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error("❌ ERRO AO CONECTAR NO MYSQL:", err);
+  } else {
+    console.log("✅ Conectado ao MySQL");
+    connection.release();
+  }
+});
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+// arquivos estáticos
 app.use('/Cursos', express.static(path.join(__dirname, '..', 'Cursos')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'cadastro')));
@@ -32,6 +46,7 @@ app.use(express.static(path.join(__dirname, '..', 'home')));
 app.use(express.static(path.join(__dirname, '..', 'sobre')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ================== MIDDLEWARES ==================
 function autenticarJWT(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -61,6 +76,7 @@ function verificarProfessor(req, res, next) {
   });
 }
 
+// ================== ROTAS ==================
 app.post('/api/cadastro', async (req, res) => {
   const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
 
@@ -133,6 +149,12 @@ app.get('/api/perfil', autenticarJWT, (req, res) => {
   });
 });
 
+// rota teste
+app.get("/", (req, res) => {
+  res.send("🚀 Servidor online!");
+});
+
+// ================== START ==================
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
