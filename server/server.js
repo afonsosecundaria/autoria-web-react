@@ -62,71 +62,80 @@ function autenticarJWT(req, res, next) {
 
 app.post('/api/cadastro', async (req, res) => {
   const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
+
   if (!nome || !sobrenome || !email || !telefone || !senha || !tipo_usuario) {
     return res.status(400).json({ error: "Todos os campos são obrigatórios." });
   }
 
   try {
     const senhaHash = await bcrypt.hash(senha, 10);
-    const nomeCompleto = `${nome} ${sobrenome}`;
 
     const sql = `
-        INSERT INTO usuarios (nome, email, telefone, senha, tipo_usuario)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-    db.query(sql, [nomeCompleto, email, telefone, senhaHash, tipo_usuario], (err) => {
+      INSERT INTO usuarios (nome, sobrenome, email, telefone, senha, tipo_usuario)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(sql, [nome, sobrenome, email, telefone, senhaHash, tipo_usuario], (err) => {
       if (err) {
-        console.error("Erro ao inserir usuário:", err);
-        return res.status(500).json({ error: "Erro ao cadastrar." });
+        console.error(err);
+        return res.status(500).json({ error: "Erro ao cadastrar usuário." });
       }
+
       res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
     });
+
   } catch (err) {
     res.status(500).json({ error: "Erro interno no servidor." });
   }
 });
 
+
 app.post('/api/login', (req, res) => {
   const { email, senha } = req.body;
-  if (!email || !senha) {
-    return res.status(400).json({ error: "Email e senha são obrigatórios." });
-  }
 
-  const sql = "SELECT id_usuario, nome, email, telefone, senha, tipo_usuario FROM usuarios WHERE email = ?";
+  const sql = "SELECT * FROM usuarios WHERE email = ?";
+
   db.query(sql, [email], async (err, results) => {
-    if (err) {
-      console.error("Erro no query de login:", err);
-      return res.status(500).json({ error: "Erro no servidor." });
-    }
-    if (results.length === 0) {
-      return res.status(401).json({ error: "Credenciais inválidas." });
-    }
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+    if (results.length === 0) return res.status(401).json({ error: "Usuário não encontrado." });
 
     const user = results[0];
     const match = await bcrypt.compare(senha, user.senha);
-    if (!match) {
-      return res.status(401).json({ error: "Credenciais inválidas." });
-    }
 
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token });
+    if (!match) return res.status(401).json({ error: "Senha incorreta." });
+
+    const token = jwt.sign(
+      { id: user.id_usuario },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    res.json({
+      token,
+      usuario: {
+        id: user.id_usuario,
+        nome: user.nome,
+        sobrenome: user.sobrenome,
+        tipo: user.tipo_usuario
+      }
+    });
   });
 });
 
-
 app.get('/api/perfil', autenticarJWT, (req, res) => {
-  const sql = "SELECT nome, email, telefone, tipo_usuario FROM usuarios WHERE id = ?";
+  const sql = `
+    SELECT nome, sobrenome, email, telefone, tipo_usuario
+    FROM usuarios WHERE id_usuario = ?
+  `;
+
   db.query(sql, [req.userId], (err, results) => {
-    if (err) {
-      console.error("Erro ao buscar perfil:", err);
-      return res.status(500).json({ error: "Erro no servidor." });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
-    }
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+    if (results.length === 0) return res.status(404).json({ error: "Usuário não encontrado." });
+
     res.json(results[0]);
   });
 });
+
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
