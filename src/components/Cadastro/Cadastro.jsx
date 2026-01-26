@@ -32,7 +32,7 @@ export default function Cadastro() {
     };
 
     try {
-      const res = await fetch("http://autoria-web-react.vercel.app/api/cadastro", {
+      const res = await fetch("https://autoria-web-react-production.up.railway.app/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

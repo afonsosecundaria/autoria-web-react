@@ -9,7 +9,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://autoria-web-react.vercel.app/api/login", {
+      const res = await fetch("https://autoria-web-react-production.up.railway.app/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
