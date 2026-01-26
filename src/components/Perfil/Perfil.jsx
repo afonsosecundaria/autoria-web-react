@@ -70,9 +70,10 @@ export default function Perfil() {
       </nav>
 
       <section className={styles.profileContent}>
-        {abaAtiva === "perfil" && <MeuPerfil />}
-        {abaAtiva === "dados" && <MeusDados />}
+        {abaAtiva === "perfil" && <MeuPerfil usuario={usuario} />}
+        {abaAtiva === "dados" && <MeusDados usuario={usuario} />}
         {abaAtiva === "privacidade" && <Privacidade />}
+
       </section>
     </Layout>
   );
