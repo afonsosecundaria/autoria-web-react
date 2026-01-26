@@ -12,9 +12,8 @@ export default function Perfil() {
   useEffect(() => {
     async function carregarPerfil() {
       const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:3000/api/perfil", {
-        headers: {
+      const res = await fetch("http://autoria-web-react.vercel.app/api/perfil", {
+        headers: {    
           Authorization: `Bearer ${token}`,
         },
       });
