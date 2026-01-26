@@ -16,8 +16,8 @@ const db = mysql.createPool({
   host: "trolley.proxy.rlwy.net",
   user: "root",
   password: "XLerpJtDItzHQDJFjmigxCTKkEtqfLdH",
-  database: "cursos_online",
-  // database: "railway",
+  // database: "cursos_online",
+  database: "railway",
   port: 13120
 });
 
