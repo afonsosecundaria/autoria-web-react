@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET || 'seuSegredoSuperSecreto';
 
-// 🔥 BANCO COM TRATAMENTO DE ERRO
+// 🔥 BANCO
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -22,7 +22,7 @@ const db = mysql.createPool({
   port: process.env.DB_PORT,
 });
 
-// Testa conexão com banco
+// Testa conexão
 db.getConnection((err, connection) => {
   if (err) {
     console.error("❌ ERRO AO CONECTAR NO MYSQL:", err);
@@ -36,51 +36,16 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-// arquivos estáticos
-app.use('/Cursos', express.static(path.join(__dirname, '..', 'Cursos')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static(path.join(__dirname, '..', 'cadastro')));
-app.use(express.static(path.join(__dirname, '..', 'login')));
-app.use(express.static(path.join(__dirname, '..', 'perfil')));
-app.use(express.static(path.join(__dirname, '..', 'home')));
-app.use(express.static(path.join(__dirname, '..', 'sobre')));
-app.use(express.static(path.join(__dirname, 'public')));
+// ================== ROTAS ==================
 
-// ================== MIDDLEWARES ==================
-function autenticarJWT(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: "Token não fornecido." });
-  }
+app.post('/api/cadastro', async (req, res) => {
+  try {
+    const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
 
-  const token = authHeader.split(' ')[1];
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ error: "Token inválido." });
-    req.userId = decoded.id;
-    next();
-  });
-}
-
-function verificarProfessor(req, res, next) {
-  const sql = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
-  db.query(sql, [req.userId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Erro no servidor." });
-    if (results.length === 0) return res.status(404).json({ error: "Usuário não encontrado." });
-
-    if (results[0].tipo_usuario !== "professor") {
-      return res.status(403).json({ error: "Acesso negado. Apenas professores." });
+    if (!nome || !sobrenome || !email || !telefone || !senha || !tipo_usuario) {
+      return res.status(400).json({ error: "Dados incompletos." });
     }
 
-    next();
-  });
-}
-
-// ================== ROTAS ==================
-app.post('/api/cadastro', async (req, res) => {
-  const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
-
-  try {
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const sql = `
@@ -90,15 +55,15 @@ app.post('/api/cadastro', async (req, res) => {
 
     db.query(sql, [nome, sobrenome, email, telefone, senhaHash, tipo_usuario], (err) => {
       if (err) {
-        console.error("ERRO MYSQL:", err);
-        return res.status(500).json({ error: err.sqlMessage });
+        console.error("❌ ERRO MYSQL:", err);
+        return res.status(500).json({ error: "Erro ao inserir no banco." });
       }
 
       res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
     });
 
   } catch (err) {
-    console.error("ERRO GERAL:", err);
+    console.error("❌ ERRO NO CADASTRO:", err);
     res.status(500).json({ error: "Erro interno no servidor." });
   }
 });
@@ -135,18 +100,8 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.get('/api/perfil', autenticarJWT, (req, res) => {
-  const sql = `
-    SELECT nome, sobrenome, email, telefone, tipo_usuario
-    FROM usuarios WHERE id_usuario = ?
-  `;
-
-  db.query(sql, [req.userId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Erro no servidor." });
-    if (results.length === 0) return res.status(404).json({ error: "Usuário não encontrado." });
-
-    res.json(results[0]);
-  });
+app.get('/api/perfil', (req, res) => {
+  res.send("ok");
 });
 
 // rota teste
