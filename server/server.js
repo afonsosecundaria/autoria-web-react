@@ -100,9 +100,27 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.get('/api/perfil', (req, res) => {
-  res.send("ok");
+app.get('/api/perfil', autenticarJWT, (req, res) => {
+  const sql = `
+    SELECT nome, sobrenome, email, telefone, tipo_usuario
+    FROM usuarios
+    WHERE id_usuario = ?
+  `;
+
+  db.query(sql, [req.userId], (err, results) => {
+    if (err) {
+      console.error("ERRO NO PERFIL:", err);
+      return res.status(500).json({ error: "Erro no servidor." });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    res.json(results[0]);
+  });
 });
+
 
 // rota teste
 app.get("/", (req, res) => {
