@@ -36,6 +36,26 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+function autenticarJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Token não fornecido." });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: "Token inválido." });
+    }
+
+    req.userId = decoded.id;
+    next();
+  });
+}
+
+
 // ================== ROTAS ==================
 
 app.post('/api/cadastro', async (req, res) => {
