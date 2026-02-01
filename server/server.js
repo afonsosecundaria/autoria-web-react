@@ -142,6 +142,7 @@ app.get('/api/perfil', autenticarJWT, (req, res) => {
 });
 
 
+
 // rota teste
 app.get("/", (req, res) => {
   res.send("🚀 Servidor online!");

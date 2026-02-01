@@ -18,8 +18,8 @@ export default function Layout({ children }) {
         <aside className={styles.sidebar}>
           <a href="/perfil" className={styles.sidebarItem}>Minhas preferências</a>
           <a href="/" className={styles.sidebarItem}>Catálogo de cursos</a>
-          <a className={styles.sidebarItem}>Meus cursos</a>
-          <a className={styles.sidebarItem}>Sistema de questões</a>
+          <a href="/meuscursos" className={styles.sidebarItem}>Meus cursos</a>
+          <a href="/questoes" className={styles.sidebarItem}>Sistema de questões</a>
           <a href="/login" className={styles.sidebarItem}>Entrar</a>
         </aside>
 
