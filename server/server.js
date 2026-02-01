@@ -240,6 +240,62 @@ app.get("/api/cursos/:id", autenticarJWT, (req, res) => {
   });
 });
 
+// =====================
+// CRIAR TÓPICO (PROFESSOR)
+// =====================
+app.post("/api/topicos", autenticarJWT, (req, res) => {
+  const { id_curso, titulo, descricao } = req.body;
+
+  const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
+
+  db.query(sqlUsuario, [req.userId], (err, results) => {
+    if (err) return res.status(500).json(err);
+
+    if (results[0].tipo_usuario !== "professor") {
+      return res.status(403).json({ error: "Apenas professores." });
+    }
+
+    const sql = `
+      INSERT INTO topicos (id_curso, titulo, descricao)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(sql, [id_curso, titulo, descricao], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Tópico criado!" });
+    });
+  });
+});
+
+// =====================
+// CRIAR MATERIAL
+// =====================
+app.post("/api/materiais", autenticarJWT, (req, res) => {
+  const { id_topico, tipo, titulo, url_arquivo } = req.body;
+
+  const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
+
+  db.query(sqlUsuario, [req.userId], (err, results) => {
+    if (err) return res.status(500).json(err);
+
+    if (results[0].tipo_usuario !== "professor") {
+      return res.status(403).json({ error: "Apenas professores." });
+    }
+
+    const sql = `
+      INSERT INTO materiais (id_topico, tipo, titulo, url_arquivo)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    db.query(sql, [id_topico, tipo, titulo, url_arquivo], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Material adicionado!" });
+    });
+  });
+});
+
+
+
 // TESTE
 app.get("/", (req, res) => {
   res.send("🚀 Servidor online!");

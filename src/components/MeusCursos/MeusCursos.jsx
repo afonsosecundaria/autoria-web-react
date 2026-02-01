@@ -1,37 +1,37 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
 import styles from "./MeusCursos.module.css";
 
 export default function MeusCursos() {
-  const cursos = [
-    { nome: "Modelo Conceitual", cor: "#3b5cff", favorito: false },
-    { nome: "Modelo Lógico", cor: "#ff00cc", favorito: false },
-    { nome: "Linguagem SQL", cor: "#ff00cc", favorito: true },
-  ];
+  const [cursos, setCursos] = useState([]);
+  const navigate = useNavigate(); // 👈 FALTAVA ISSO
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setCursos(data));
+  }, []);
 
   return (
     <Layout>
-      <div className={styles.page}>
-        <h2 className={styles.title}>Meus Cursos</h2>
+      <h2>Meus Cursos</h2>
 
-        <div className={styles.grid} onClick={() => navigate(`/curso/${id}`)}>
-          {cursos.map((curso, i) => (
-            <div key={i} className={styles.card}>
-              <span className={styles.star}>
-                {curso.favorito ? "⭐" : "☆"}
-              </span>
-
-              <div className={styles.cardContent}>
-                {curso.nome}
-              </div>
-
-              <div
-                className={styles.progress}
-                style={{ backgroundColor: curso.cor }}
-              />
-            </div>
-          ))}
-        </div>
+      <div className={styles.grid}>
+        {cursos.map(curso => (
+          <div
+            key={curso.id_curso}
+            className={styles.card}
+            onClick={() => navigate(`/curso/${curso.id_curso}`)} // 👈 AQUI
+          >
+            <h3>{curso.titulo}</h3>
+            <p>{curso.descricao}</p>
+          </div>
+        ))}
       </div>
     </Layout>
   );
