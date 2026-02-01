@@ -7,6 +7,8 @@ import BancoQuestoes from './components/BancoQuestoes/BancoQuestoes';
 import MeusCursos from './components/MeusCursos/MeusCursos';
 import CursoDetalhe from './components/DetalheCursos/DetalheCursos';
 import CriarCurso from './components/CriarCurso/CriarCurso';
+import CriarQuestao from './components/CriarQuestao/CriarQuestao';
+import FazerQuestoes from './components/FazerQuestoes/FazerQuestoes';
 
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
       <Route path='/meuscursos' element={<MeusCursos/>} />
       <Route path='/curso/:id' element={<CursoDetalhe/>} />
       <Route path="/criar-curso" element={<CriarCurso />} />
+      {/* <Route path="/questoes/:idTopico" element={<TelaQuestoes />} /> */}
+      <Route path="/criar-questao/:idTopico" element={<CriarQuestao />} />
     </Routes>
   );
 }

@@ -294,7 +294,148 @@ app.post("/api/materiais", autenticarJWT, (req, res) => {
   });
 });
 
+// =====================
+// CRIAR QUESTÃO (PROFESSOR)
+// =====================
+app.post("/api/questoes", autenticarJWT, (req, res) => {
+  const { id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta } = req.body;
 
+  if (!id_topico || !enunciado || !alternativa_a || !alternativa_b || !alternativa_c || !alternativa_d || !resposta_correta) {
+    return res.status(400).json({ error: "Dados incompletos." });
+  }
+
+  // verifica se é professor
+  const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
+
+  db.query(sqlUsuario, [req.userId], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    if (results[0].tipo_usuario !== "professor") {
+      return res.status(403).json({ error: "Apenas professores podem cadastrar questões." });
+    }
+
+    const sql = `
+      INSERT INTO questoes
+      (id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+      sql,
+      [id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta],
+      (err) => {
+        if (err) {
+          console.error("ERRO AO INSERIR QUESTÃO:", err);
+          return res.status(500).json({ error: "Erro ao cadastrar questão." });
+        }
+
+        res.json({ message: "Questão cadastrada com sucesso!" });
+      }
+    );
+  });
+});
+
+// app.post("/api/questoes", autenticarJWT, (req, res) => {
+//   const {
+//     id_topico,
+//     enunciado,
+//     alternativa_a,
+//     alternativa_b,
+//     alternativa_c,
+//     alternativa_d,
+//     resposta_correta
+//   } = req.body;
+
+//   // Verifica se é professor
+//   const sqlUser = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
+
+//   db.query(sqlUser, [req.userId], (err, result) => {
+//     if (err) return res.status(500).json(err);
+
+//     if (result[0].tipo_usuario !== "professor") {
+//       return res.status(403).json({ error: "Apenas professores podem cadastrar questões" });
+//     }
+
+//     const sql = `
+//       INSERT INTO questoes
+//       (id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta)
+//       VALUES (?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     db.query(sql, [
+//       id_topico,
+//       enunciado,
+//       alternativa_a,
+//       alternativa_b,
+//       alternativa_c,
+//       alternativa_d,
+//       resposta_correta
+//     ], (err) => {
+//       if (err) return res.status(500).json(err);
+//       res.json({ message: "Questão cadastrada com sucesso!" });
+//     });
+//   });
+// });
+
+// =====================
+// LISTAR QUESTÕES POR TÓPICO
+// =====================
+app.get("/api/questoes/:idTopico", autenticarJWT, (req, res) => {
+  const { idTopico } = req.params;
+
+  const sql = `
+    SELECT id_questao, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d
+    FROM questoes
+    WHERE id_topico = ?
+  `;
+
+  db.query(sql, [idTopico], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+
+    if (results.length === 0) {
+      return res.json([]); // frontend mostra "professor ainda não cadastrou"
+    }
+
+    res.json(results);
+  });
+});
+
+
+app.post("/api/respostas", autenticarJWT, (req, res) => {
+  const { id_questao, resposta_marcada } = req.body;
+
+  const sqlBusca = `
+    SELECT resposta_correta
+    FROM questoes
+    WHERE id_questao = ?
+  `;
+
+  db.query(sqlBusca, [id_questao], (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    const correta = result[0].resposta_correta === resposta_marcada;
+
+    const sqlInsert = `
+      INSERT INTO respostas_aluno
+      (id_usuario, id_questao, resposta_marcada, correta)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    db.query(sqlInsert, [
+      req.userId,
+      id_questao,
+      resposta_marcada,
+      correta
+    ], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ correta });
+    });
+  });
+});
 
 // TESTE
 app.get("/", (req, res) => {

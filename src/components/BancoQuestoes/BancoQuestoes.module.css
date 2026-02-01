@@ -1,0 +1,67 @@
+.container {
+  padding: 30px;
+}
+
+.title {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.box {
+  display: flex;
+  border: 1px solid #ccc;
+  min-height: 400px;
+}
+
+.filtros {
+  width: 50%;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+
+.resumo {
+  width: 50%;
+  padding: 20px;
+}
+
+.disciplina {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.topicos {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+.topico {
+  display: block;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.botoes {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 10px 18px;
+  background: #e91cff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btnProfessor {
+  padding: 10px 18px;
+  background: #222;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}

@@ -1,0 +1,27 @@
+.title {
+  margin-bottom: 20px;
+}
+
+.form {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input, textarea, select {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  min-height: 120px;
+}
+
+button {
+  padding: 12px;
+  background: #e91cff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

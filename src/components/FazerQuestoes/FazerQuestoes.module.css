@@ -1,0 +1,19 @@
+.title {
+  margin-bottom: 20px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.alt {
+  display: block;
+  margin-top: 5px;
+}
+
+.vazio {
+  text-align: center;
+  margin-top: 100px;
+}
