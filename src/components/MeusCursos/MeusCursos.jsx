@@ -1,38 +1,38 @@
 import React from "react";
 import Layout from "../Layout/Layout";
+import styles from "./MeusCursos.module.css";
 
 export default function MeusCursos() {
-  const cursos = ["Modelo Conceitual", "Modelo Lógico", "Linguagem SQL"];
-
-  const styles = {
-    page: { padding: "30px" },
-    title: { fontSize: "26px", marginBottom: "20px" },
-    grid: { display: "flex", gap: "20px" },
-    card: {
-      width: "220px",
-      height: "120px",
-      border: "1px solid #333",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontWeight: "bold",
-      cursor: "pointer"
-    }
-  };
+  const cursos = [
+    { nome: "Modelo Conceitual", cor: "#3b5cff", favorito: false },
+    { nome: "Modelo Lógico", cor: "#ff00cc", favorito: false },
+    { nome: "Linguagem SQL", cor: "#ff00cc", favorito: true },
+  ];
 
   return (
     <Layout>
-        <div style={styles.page}>
-            <h2 style={styles.title}>Meus Cursos</h2>
+      <div className={styles.page}>
+        <h2 className={styles.title}>Meus Cursos</h2>
 
-            <div style={styles.grid}>
-                {cursos.map((c, i) => (
-                    <div key={i} style={styles.card}>
-                        {c}
-                    </div>
-                ))}
+        <div className={styles.grid} onClick={() => navigate(`/curso/${id}`)}>
+          {cursos.map((curso, i) => (
+            <div key={i} className={styles.card}>
+              <span className={styles.star}>
+                {curso.favorito ? "⭐" : "☆"}
+              </span>
+
+              <div className={styles.cardContent}>
+                {curso.nome}
+              </div>
+
+              <div
+                className={styles.progress}
+                style={{ backgroundColor: curso.cor }}
+              />
             </div>
+          ))}
         </div>
+      </div>
     </Layout>
   );
 }

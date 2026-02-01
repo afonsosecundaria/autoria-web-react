@@ -1,19 +1,17 @@
 require("dotenv").config();
-const express = require('express');
-const path = require('path');
-const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bcrypt = require("bcrypt");
+const bodyParser = require("body-parser");
 const mysql = require("mysql2");
 const cors = require("cors");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// 🔥 PORTA CORRETA PRA PRODUÇÃO
 const PORT = process.env.PORT || 8080;
-const JWT_SECRET = process.env.JWT_SECRET || 'seuSegredoSuperSecreto';
+const JWT_SECRET = process.env.JWT_SECRET || "seuSegredoSuperSecreto";
 
-// 🔥 BANCO
+// BANCO
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -22,7 +20,7 @@ const db = mysql.createPool({
   port: process.env.DB_PORT,
 });
 
-// Testa conexão
+// TESTE CONEXÃO
 db.getConnection((err, connection) => {
   if (err) {
     console.error("❌ ERRO AO CONECTAR NO MYSQL:", err);
@@ -36,6 +34,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+// ================== MIDDLEWARE ==================
 function autenticarJWT(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -46,23 +45,20 @@ function autenticarJWT(req, res, next) {
   const token = authHeader.split(" ")[1];
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: "Token inválido." });
-    }
+    if (err) return res.status(401).json({ error: "Token inválido." });
 
     req.userId = decoded.id;
     next();
   });
 }
 
-
 // ================== ROTAS ==================
 
-app.post('/api/cadastro', async (req, res) => {
+app.post("/api/cadastro", async (req, res) => {
   try {
     const { nome, sobrenome, email, telefone, senha, tipo_usuario } = req.body;
 
-    if (!nome || !sobrenome || !email || !telefone || !senha || !tipo_usuario) {
+    if (!nome || !sobrenome || !email || !senha || !tipo_usuario) {
       return res.status(400).json({ error: "Dados incompletos." });
     }
 
@@ -73,54 +69,53 @@ app.post('/api/cadastro', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [nome, sobrenome, email, telefone, senhaHash, tipo_usuario], (err) => {
-      if (err) {
-        console.error("❌ ERRO MYSQL:", err);
-        return res.status(500).json({ error: "Erro ao inserir no banco." });
+    db.query(
+      sql,
+      [nome, sobrenome, email, telefone, senhaHash, tipo_usuario],
+      (err) => {
+        if (err) return res.status(500).json({ error: "Erro ao cadastrar." });
+        res.status(201).json({ message: "Usuário cadastrado!" });
       }
-
-      res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
-    });
-
+    );
   } catch (err) {
-    console.error("❌ ERRO NO CADASTRO:", err);
-    res.status(500).json({ error: "Erro interno no servidor." });
+    res.status(500).json({ error: "Erro interno." });
   }
 });
 
-app.post('/api/login', (req, res) => {
+// LOGIN
+app.post("/api/login", (req, res) => {
   const { email, senha } = req.body;
 
   const sql = "SELECT * FROM usuarios WHERE email = ?";
 
   db.query(sql, [email], async (err, results) => {
     if (err) return res.status(500).json({ error: "Erro no servidor." });
-    if (results.length === 0) return res.status(401).json({ error: "Usuário não encontrado." });
+    if (results.length === 0)
+      return res.status(401).json({ error: "Usuário não encontrado." });
 
     const user = results[0];
     const match = await bcrypt.compare(senha, user.senha);
 
-    if (!match) return res.status(401).json({ error: "Senha incorreta." });
+    if (!match)
+      return res.status(401).json({ error: "Senha incorreta." });
 
-    const token = jwt.sign(
-      { id: user.id_usuario },
-      JWT_SECRET,
-      { expiresIn: "24h" }
-    );
+    const token = jwt.sign({ id: user.id_usuario }, JWT_SECRET, {
+      expiresIn: "24h",
+    });
 
     res.json({
       token,
       usuario: {
         id: user.id_usuario,
         nome: user.nome,
-        sobrenome: user.sobrenome,
-        tipo: user.tipo_usuario
-      }
+        tipo_usuario: user.tipo_usuario,
+      },
     });
   });
 });
 
-app.get('/api/perfil', autenticarJWT, (req, res) => {
+// PERFIL
+app.get("/api/perfil", autenticarJWT, (req, res) => {
   const sql = `
     SELECT nome, sobrenome, email, telefone, tipo_usuario
     FROM usuarios
@@ -128,27 +123,128 @@ app.get('/api/perfil', autenticarJWT, (req, res) => {
   `;
 
   db.query(sql, [req.userId], (err, results) => {
-    if (err) {
-      console.error("ERRO NO PERFIL:", err);
-      return res.status(500).json({ error: "Erro no servidor." });
-    }
-
-    if (results.length === 0) {
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+    if (results.length === 0)
       return res.status(404).json({ error: "Usuário não encontrado." });
-    }
 
     res.json(results[0]);
   });
 });
 
+// LISTAR CURSOS
+app.get("/api/cursos", autenticarJWT, (req, res) => {
+  const sql = `
+    SELECT c.*, u.nome AS professor
+    FROM cursos c
+    JOIN usuarios u ON c.id_professor = u.id_usuario
+  `;
 
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+});
 
-// rota teste
+// CRIAR CURSO (PROFESSOR)
+app.post("/api/cursos", autenticarJWT, (req, res) => {
+  const { titulo, descricao } = req.body;
+
+  if (!titulo || !descricao) {
+    return res.status(400).json({ error: "Preencha todos os campos." });
+  }
+
+  const sqlUsuario = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
+
+  db.query(sqlUsuario, [req.userId], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+
+    if (results[0].tipo_usuario !== "professor") {
+      return res.status(403).json({ error: "Apenas professores." });
+    }
+
+    const sqlCurso = `
+      INSERT INTO cursos (id_professor, titulo, descricao)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(sqlCurso, [req.userId, titulo, descricao], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Curso criado!" });
+    });
+  });
+});
+
+// MATRICULAR
+app.post("/api/matriculas", autenticarJWT, (req, res) => {
+  const { id_curso } = req.body;
+
+  const sqlCheck = `
+    SELECT * FROM matriculas WHERE id_usuario = ? AND id_curso = ?
+  `;
+
+  db.query(sqlCheck, [req.userId, id_curso], (err, results) => {
+    if (results.length > 0) {
+      return res.status(400).json({ error: "Já matriculado." });
+    }
+
+    const sql = `
+      INSERT INTO matriculas (id_usuario, id_curso)
+      VALUES (?, ?)
+    `;
+
+    db.query(sql, [req.userId, id_curso], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Matrícula realizada!" });
+    });
+  });
+});
+
+// DETALHE DO CURSO
+app.get("/api/cursos/:id", autenticarJWT, (req, res) => {
+  const idCurso = req.params.id;
+
+  const sql = `
+    SELECT t.id_topico, t.titulo AS topico, t.descricao,
+           m.id_material, m.tipo, m.titulo AS material, m.url_arquivo
+    FROM topicos t
+    LEFT JOIN materiais m ON t.id_topico = m.id_topico
+    WHERE t.id_curso = ?
+  `;
+
+  db.query(sql, [idCurso], (err, results) => {
+    if (err) return res.status(500).json(err);
+
+    const topicos = {};
+
+    results.forEach((r) => {
+      if (!topicos[r.id_topico]) {
+        topicos[r.id_topico] = {
+          id_topico: r.id_topico,
+          titulo: r.topico,
+          descricao: r.descricao,
+          materiais: [],
+        };
+      }
+
+      if (r.id_material) {
+        topicos[r.id_topico].materiais.push({
+          id_material: r.id_material,
+          tipo: r.tipo,
+          titulo: r.material,
+          url_arquivo: r.url_arquivo,
+        });
+      }
+    });
+
+    res.json(Object.values(topicos));
+  });
+});
+
+// TESTE
 app.get("/", (req, res) => {
   res.send("🚀 Servidor online!");
 });
 
-// ================== START ==================
 app.listen(PORT, () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });

@@ -5,6 +5,8 @@ import Cadastro from './components/Cadastro/Cadastro'
 import Perfil from './components/Perfil/Perfil';
 import BancoQuestoes from './components/BancoQuestoes/BancoQuestoes';
 import MeusCursos from './components/MeusCursos/MeusCursos';
+import CursoDetalhe from './components/DetalheCursos/DetalheCursos';
+import CriarCurso from './components/CriarCurso/CriarCurso';
 
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
       <Route path='/perfil' element={<Perfil/>} />
       <Route path='/questoes' element={<BancoQuestoes/>} />
       <Route path='/meuscursos' element={<MeusCursos/>} />
+      <Route path='/curso/:id' element={<CursoDetalhe/>} />
+      <Route path="/criar-curso" element={<CriarCurso />} />
     </Routes>
   );
 }

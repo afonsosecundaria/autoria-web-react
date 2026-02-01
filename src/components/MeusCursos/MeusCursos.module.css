@@ -1,0 +1,51 @@
+.page {
+  padding: 30px;
+}
+
+.title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.grid {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  width: 240px;
+  height: 130px;
+  border: 1px solid #333;
+  background-color: #f2f2f2;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card:hover {
+  background-color: #eaeaea;
+}
+
+.star {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 18px;
+}
+
+.cardContent {
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.progress {
+  height: 6px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
