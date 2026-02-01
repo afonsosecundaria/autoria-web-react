@@ -294,21 +294,28 @@ app.post("/api/materiais", autenticarJWT, (req, res) => {
   });
 });
 
-// =====================
-// CRIAR QUESTÃO (PROFESSOR)
-// =====================
 app.post("/api/questoes", autenticarJWT, (req, res) => {
-  const { id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta } = req.body;
+  const {
+    id_topico,
+    enunciado,
+    alternativa_a,
+    alternativa_b,
+    alternativa_c,
+    alternativa_d,
+    resposta_correta
+  } = req.body;
 
   if (!id_topico || !enunciado || !alternativa_a || !alternativa_b || !alternativa_c || !alternativa_d || !resposta_correta) {
     return res.status(400).json({ error: "Dados incompletos." });
   }
 
-  // verifica se é professor
   const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
 
   db.query(sqlUsuario, [req.userId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Erro no servidor." });
+    if (err) {
+      console.error("ERRO SQL USUÁRIO:", err);
+      return res.status(500).json({ error: "Erro no servidor." });
+    }
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Usuário não encontrado." });
@@ -324,62 +331,25 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(
-      sql,
-      [id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta],
-      (err) => {
-        if (err) {
-          console.error("ERRO AO INSERIR QUESTÃO:", err);
-          return res.status(500).json({ error: "Erro ao cadastrar questão." });
-        }
-
-        res.json({ message: "Questão cadastrada com sucesso!" });
+    db.query(sql, [
+      id_topico,
+      enunciado,
+      alternativa_a,
+      alternativa_b,
+      alternativa_c,
+      alternativa_d,
+      resposta_correta
+    ], (err) => {
+      if (err) {
+        console.error("ERRO INSERT QUESTAO:", err);
+        return res.status(500).json({ error: "Erro ao cadastrar questão." });
       }
-    );
+
+      res.json({ message: "Questão cadastrada com sucesso!" });
+    });
   });
 });
 
-// app.post("/api/questoes", autenticarJWT, (req, res) => {
-//   const {
-//     id_topico,
-//     enunciado,
-//     alternativa_a,
-//     alternativa_b,
-//     alternativa_c,
-//     alternativa_d,
-//     resposta_correta
-//   } = req.body;
-
-//   // Verifica se é professor
-//   const sqlUser = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
-
-//   db.query(sqlUser, [req.userId], (err, result) => {
-//     if (err) return res.status(500).json(err);
-
-//     if (result[0].tipo_usuario !== "professor") {
-//       return res.status(403).json({ error: "Apenas professores podem cadastrar questões" });
-//     }
-
-//     const sql = `
-//       INSERT INTO questoes
-//       (id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta)
-//       VALUES (?, ?, ?, ?, ?, ?, ?)
-//     `;
-
-//     db.query(sql, [
-//       id_topico,
-//       enunciado,
-//       alternativa_a,
-//       alternativa_b,
-//       alternativa_c,
-//       alternativa_d,
-//       resposta_correta
-//     ], (err) => {
-//       if (err) return res.status(500).json(err);
-//       res.json({ message: "Questão cadastrada com sucesso!" });
-//     });
-//   });
-// });
 
 // =====================
 // LISTAR QUESTÕES POR TÓPICO
@@ -408,6 +378,10 @@ app.get("/api/questoes/:idTopico", autenticarJWT, (req, res) => {
 app.post("/api/respostas", autenticarJWT, (req, res) => {
   const { id_questao, resposta_marcada } = req.body;
 
+  if (!id_questao || !resposta_marcada) {
+    return res.status(400).json({ error: "Dados incompletos." });
+  }
+
   const sqlBusca = `
     SELECT resposta_correta
     FROM questoes
@@ -415,7 +389,14 @@ app.post("/api/respostas", autenticarJWT, (req, res) => {
   `;
 
   db.query(sqlBusca, [id_questao], (err, result) => {
-    if (err) return res.status(500).json(err);
+    if (err) {
+      console.error("ERRO BUSCA QUESTAO:", err);
+      return res.status(500).json({ error: "Erro no servidor." });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Questão não encontrada." });
+    }
 
     const correta = result[0].resposta_correta === resposta_marcada;
 
@@ -431,11 +412,16 @@ app.post("/api/respostas", autenticarJWT, (req, res) => {
       resposta_marcada,
       correta
     ], (err) => {
-      if (err) return res.status(500).json(err);
+      if (err) {
+        console.error("ERRO INSERT RESPOSTA:", err);
+        return res.status(500).json({ error: "Erro ao salvar resposta." });
+      }
+
       res.json({ correta });
     });
   });
 });
+
 
 // TESTE
 app.get("/", (req, res) => {
