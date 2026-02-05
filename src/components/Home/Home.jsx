@@ -13,17 +13,11 @@ export default function Home() {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
-        if (!res.ok) {
-          throw new Error("Erro ao buscar perfil");
-        }
+        if (!res.ok) throw new Error("Token inválido");
         return res.json();
       })
-      .then(data => {
-        console.log("DADOS DO PERFIL:", data);
-        setUsuario(data);
-      })
-      .catch(err => {
-        console.error(err);
+      .then(data => setUsuario(data))
+      .catch(() => {
         alert("Sessão expirada. Faça login novamente.");
         localStorage.removeItem("token");
         window.location.href = "/";
@@ -33,15 +27,23 @@ export default function Home() {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
-        if (!res.ok) {
-          throw new Error("Erro ao buscar cursos");
-        }
+        if (!res.ok) throw new Error("Erro ao buscar cursos");
         return res.json();
       })
-      .then(data => setCursos(data))
-      .catch(err => console.error(err));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCursos(data);
+        } else {
+          setCursos([]);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        setCursos([]);
+      });
   
   }, []);
+  
   
 
 
