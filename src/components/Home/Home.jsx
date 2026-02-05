@@ -7,23 +7,42 @@ export default function Home() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-  const token = localStorage.getItem("token");
-
-  fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log("DADOS DO PERFIL:", data);
-      setUsuario(data);
-    });
-
-  fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(res => res.json())
-    .then(data => setCursos(data));
-}, []);
+    const token = localStorage.getItem("token");
+  
+    fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erro ao buscar perfil");
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("DADOS DO PERFIL:", data);
+        setUsuario(data);
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Sessão expirada. Faça login novamente.");
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      });
+  
+    fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erro ao buscar cursos");
+        }
+        return res.json();
+      })
+      .then(data => setCursos(data))
+      .catch(err => console.error(err));
+  
+  }, []);
+  
 
 
   function matricular(id) {
