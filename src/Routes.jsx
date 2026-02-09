@@ -23,7 +23,7 @@ function App() {
       <Route path='/curso/:id' element={<CursoDetalhe/>} />
       <Route path="/criar-curso" element={<CriarCurso />} />
       <Route path="/questoes/:tema" element={<FazerQuestoes />} />
-      <Route path="/criar-questao" element={<CriarQuestao />} />
+      <Route path="/criar-questao/:topico" element={<CriarQuestao />} />
 
     </Routes>
   );
