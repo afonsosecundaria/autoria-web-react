@@ -9,6 +9,12 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
   
+    if (!token) {
+      // usuário não logado → manda pro login
+      window.location.href = "/";
+      return;
+    }
+  
     fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -18,7 +24,6 @@ export default function Home() {
       })
       .then(data => setUsuario(data))
       .catch(() => {
-        alert("Sessão expirada. Faça login novamente.");
         localStorage.removeItem("token");
         window.location.href = "/";
       });
@@ -26,21 +31,9 @@ export default function Home() {
     fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao buscar cursos");
-        return res.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setCursos(data);
-        } else {
-          setCursos([]);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        setCursos([]);
-      });
+      .then(res => res.json())
+      .then(data => setCursos(Array.isArray(data) ? data : []))
+      .catch(() => setCursos([]));
   
   }, []);
   
