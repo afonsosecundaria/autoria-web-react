@@ -10,13 +10,13 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // 1️⃣ Buscar cursos públicos (sempre)
+    // 1️⃣ Buscar cursos públicos — SEM token
     fetch("https://autoria-web-react-production.up.railway.app/api/cursos-publicos")
       .then(res => res.json())
       .then(data => setCursos(Array.isArray(data) ? data : []))
       .catch(() => setCursos([]));
 
-    // 2️⃣ Buscar perfil apenas se tiver token
+    // 2️⃣ Buscar perfil apenas se houver token
     if (token) {
       fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
         headers: { Authorization: `Bearer ${token}` }
@@ -30,7 +30,6 @@ export default function Home() {
     }
   }, []);
 
-  // Função de matrícula
   function matricular(id) {
     const token = localStorage.getItem("token");
     if (!token) return alert("Faça login para se matricular!");
@@ -48,7 +47,6 @@ export default function Home() {
       .catch(() => alert("Erro ao matricular"));
   }
 
-  // 3️⃣ Loading inicial
   if (loading) return <p>Carregando cursos...</p>;
 
   return (
