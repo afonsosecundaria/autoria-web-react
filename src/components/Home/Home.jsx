@@ -19,7 +19,6 @@ export default function Home() {
       .then(data => setUsuario(data))
       .catch(() => {
         localStorage.removeItem("token");
-        window.location.href = "/login"; // 👈 AQUI
       });
   
     fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
