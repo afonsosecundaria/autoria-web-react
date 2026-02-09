@@ -1,47 +1,58 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "./Home.module.css";
 import Layout from "../Layout/Layout";
 
 export default function Home() {
   const [cursos, setCursos] = useState([]);
   const [usuario, setUsuario] = useState(null);
-  const [loading, setLoading] = useState(true); // 👈 nova flag
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
+    // Buscar cursos — público, sem token
+    fetch("https://autoria-web-react-production.up.railway.app/api/cursos-publicos")
+      .then(res => res.json())
+      .then(data => setCursos(Array.isArray(data) ? data : []))
+      .catch(() => setCursos([]));
+
+    // Se houver token, buscar perfil
+    if (token) {
+      fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Token inválido");
+          return res.json();
+        })
+        .then(data => setUsuario(data))
+        .catch(() => localStorage.removeItem("token"))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  function matricular(id) {
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login", { replace: true }); // 👈 redireciona antes de fazer qualquer fetch
+      alert("Faça login para se matricular!");
       return;
     }
 
-    fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Token inválido");
-        return res.json();
-      })
-      .then(data => setUsuario(data))
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login", { replace: true });
-      });
-
-    fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
-      headers: { Authorization: `Bearer ${token}` }
+    fetch("https://autoria-web-react-production.up.railway.app/api/matriculas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ id_curso: id })
     })
       .then(res => res.json())
-      .then(data => setCursos(Array.isArray(data) ? data : []))
-      .catch(() => setCursos([]))
-      .finally(() => setLoading(false));
+      .then(() => alert("Matrícula realizada!"));
+  }
 
-  }, [navigate]);
-
-  // 👇 não renderiza nada enquanto carrega / valida token
-  if (loading) return null;
+  if (loading) return <p>Carregando...</p>;
 
   return (
     <Layout>

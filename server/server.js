@@ -430,6 +430,21 @@ app.post("/api/respostas", autenticarJWT, (req, res) => {
   });
 });
 
+// listar cursos públicos
+app.get("/api/cursos-publicos", (req, res) => {
+  const sql = `
+    SELECT c.*, u.nome AS professor
+    FROM cursos c
+    JOIN usuarios u ON c.id_professor = u.id_usuario
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+});
+
+
 
 
 // TESTE
