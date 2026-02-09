@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import Layout from "../Layout/Layout";
+const { idTopico } = useParams();
 import styles from "./CriarQuestao.module.css";
 
 export default function CriarQuestao() {

@@ -19,9 +19,10 @@ export default function Perfil() {
 
       // 🚫 NÃO está logado
       if (!token) {
-        setCarregando(false);
+        navigate("/login");
         return;
       }
+
 
       try {
         const res = await fetch(
