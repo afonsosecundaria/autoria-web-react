@@ -3,21 +3,23 @@ import { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
 
 export default function FazerQuestoes() {
-  const { idTopico } = useParams();
+  const { tema } = useParams(); // 👈 TEM QUE SER "tema"
   const [questoes, setQuestoes] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const tema = encodeURIComponent(idTopico);
-    
-    fetch(`https://autoria-web-react-production.up.railway.app/api/banco-questoes?tema=${idTopico}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+
+    fetch(
+      `https://autoria-web-react-production.up.railway.app/api/banco-questoes?tema=${encodeURIComponent(tema)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    })
+    )
       .then(res => res.json())
       .then(data => setQuestoes(data));
-  }, [idTopico]);
+  }, [tema]);
 
   if (questoes.length === 0) {
     return (
