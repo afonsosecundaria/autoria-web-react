@@ -294,9 +294,10 @@ app.post("/api/materiais", autenticarJWT, (req, res) => {
   });
 });
 
-app.post("/api/questoes", autenticarJWT, (req, res) => {
+
+app.post("/api/banco-questoes", autenticarJWT, (req, res) => {
   const {
-    id_topico,
+    tema,
     enunciado,
     alternativa_a,
     alternativa_b,
@@ -305,80 +306,44 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
     resposta_correta
   } = req.body;
 
-  if (
-    !id_topico ||
-    !enunciado ||
-    !alternativa_a ||
-    !alternativa_b ||
-    !alternativa_c ||
-    !alternativa_d ||
-    !resposta_correta
-  ) {
+  if (!tema || !enunciado || !alternativa_a || !alternativa_b || !alternativa_c || !alternativa_d || !resposta_correta) {
     return res.status(400).json({ error: "Dados incompletos." });
   }
 
-  const sqlUsuario = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
+  const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
 
   db.query(sqlUsuario, [req.userId], (err, results) => {
     if (err) return res.status(500).json({ error: "Erro no servidor." });
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
-    }
-
     if (results[0].tipo_usuario !== "professor") {
-      return res.status(403).json({ error: "Apenas professores podem cadastrar questões." });
+      return res.status(403).json({ error: "Apenas professores." });
     }
 
     const sql = `
-      INSERT INTO questoes
-      (id_topico, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta)
+      INSERT INTO banco_questoes
+      (tema, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, resposta_correta)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(
-      sql,
-      [
-        Number(id_topico), // 🔥 CORREÇÃO
-        enunciado,
-        alternativa_a,
-        alternativa_b,
-        alternativa_c,
-        alternativa_d,
-        resposta_correta
-      ],
-      (err) => {
-        if (err) {
-          console.error("ERRO INSERT QUESTAO:", err);
-          return res.status(500).json({ error: "Erro ao cadastrar questão." });
-        }
+    db.query(sql, [
+      tema,
+      enunciado,
+      alternativa_a,
+      alternativa_b,
+      alternativa_c,
+      alternativa_d,
+      resposta_correta
+    ], (err) => {
+      if (err) return res.status(500).json({ error: "Erro ao cadastrar questão." });
 
-        res.json({ message: "Questão cadastrada com sucesso!" });
-      }
-    );
+      res.json({ message: "Questão cadastrada no banco!" });
+    });
   });
 });
 
-
-// =====================
-// LISTAR QUESTÕES POR TÓPICO
-// =====================
-app.get("/api/questoes/:idTopico", autenticarJWT, (req, res) => {
-  const { idTopico } = req.params;
-
-  const sql = `
-    SELECT id_questao, enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d
-    FROM questoes
-    WHERE id_topico = ?
-  `;
-
-  db.query(sql, [idTopico], (err, results) => {
+app.get("/api/banco-questoes", autenticarJWT, (req, res) => {
+  db.query("SELECT * FROM banco_questoes", (err, results) => {
     if (err) return res.status(500).json({ error: "Erro no servidor." });
-
-    if (results.length === 0) {
-      return res.json([]); // frontend mostra "professor ainda não cadastrou"
-    }
-
     res.json(results);
   });
 });
@@ -393,7 +358,7 @@ app.post("/api/respostas", autenticarJWT, (req, res) => {
 
   const sqlBusca = `
     SELECT resposta_correta
-    FROM questoes
+    FROM banco_questoes
     WHERE id_questao = ?
   `;
 
@@ -415,21 +380,21 @@ app.post("/api/respostas", autenticarJWT, (req, res) => {
       VALUES (?, ?, ?, ?)
     `;
 
-    db.query(sqlInsert, [
-      req.userId,
-      id_questao,
-      resposta_marcada,
-      correta
-    ], (err) => {
-      if (err) {
-        console.error("ERRO INSERT RESPOSTA:", err);
-        return res.status(500).json({ error: "Erro ao salvar resposta." });
-      }
+    db.query(
+      sqlInsert,
+      [req.userId, id_questao, resposta_marcada, correta],
+      (err) => {
+        if (err) {
+          console.error("ERRO INSERT RESPOSTA:", err);
+          return res.status(500).json({ error: "Erro ao salvar resposta." });
+        }
 
-      res.json({ correta });
-    });
+        res.json({ correta });
+      }
+    );
   });
 });
+
 
 
 // TESTE

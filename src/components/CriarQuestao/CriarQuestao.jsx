@@ -1,11 +1,8 @@
-import { useParams } from "react-router-dom";
 import { useState } from "react";
 import Layout from "../Layout/Layout";
-import styles from "./CriarQuestao.module.css";
 
 export default function CriarQuestao() {
-  const { idTopico } = useParams(); // ← aqui
-
+  const [tema, setTema] = useState("");
   const [enunciado, setEnunciado] = useState("");
   const [a, setA] = useState("");
   const [b, setB] = useState("");
@@ -15,17 +12,16 @@ export default function CriarQuestao() {
 
   async function salvarQuestao(e) {
     e.preventDefault();
-
     const token = localStorage.getItem("token");
 
-    const res = await fetch("https://autoria-web-react-production.up.railway.app/api/questoes", {
+    const res = await fetch("https://autoria-web-react-production.up.railway.app/api/banco-questoes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        id_topico: Number(idTopico), // 🔴 ESSENCIAL
+        tema,
         enunciado,
         alternativa_a: a,
         alternativa_b: b,
@@ -37,35 +33,42 @@ export default function CriarQuestao() {
 
     const data = await res.json();
 
-    if (!res.ok) {
-      alert(data.error);
-      return;
-    }
+    if (!res.ok) return alert(data.error);
 
-    alert(data.message);
+    alert("Questão salva no banco!");
   }
 
   return (
     <Layout>
-      <h2>Cadastrar Questão</h2>
-      <p>Tópico: {idTopico}</p>
+      <h2>Banco de Questões</h2>
 
-      <form onSubmit={salvarQuestao}>
-        <textarea value={enunciado} onChange={e => setEnunciado(e.target.value)} />
-        <input value={a} onChange={e => setA(e.target.value)} />
-        <input value={b} onChange={e => setB(e.target.value)} />
-        <input value={c} onChange={e => setC(e.target.value)} />
-        <input value={d} onChange={e => setD(e.target.value)} />
+      <input
+        placeholder="Tema (ex: Crase, SQL, Redes)"
+        value={tema}
+        onChange={e => setTema(e.target.value)}
+        required
+      />
 
-        <select value={correta} onChange={e => setCorreta(e.target.value)}>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
-        </select>
+      <textarea
+        placeholder="Enunciado"
+        value={enunciado}
+        onChange={e => setEnunciado(e.target.value)}
+        required
+      />
 
-        <button>Cadastrar</button>
-      </form>
+      <input placeholder="A" value={a} onChange={e => setA(e.target.value)} />
+      <input placeholder="B" value={b} onChange={e => setB(e.target.value)} />
+      <input placeholder="C" value={c} onChange={e => setC(e.target.value)} />
+      <input placeholder="D" value={d} onChange={e => setD(e.target.value)} />
+
+      <select value={correta} onChange={e => setCorreta(e.target.value)}>
+        <option value="A">Correta: A</option>
+        <option value="B">Correta: B</option>
+        <option value="C">Correta: C</option>
+        <option value="D">Correta: D</option>
+      </select>
+
+      <button onClick={salvarQuestao}>Salvar</button>
     </Layout>
   );
 }
