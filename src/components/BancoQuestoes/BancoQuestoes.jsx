@@ -115,7 +115,7 @@ export default function BancoQuestoes() {
                 <button
                   className={styles.btnProfessor}
                   onClick={() =>
-                    navigate(`/criar-questao/${mapaTopicos[topico]}`)
+                    navigate('/criar-questao')
                   }
                 >
                   + Cadastrar questão
