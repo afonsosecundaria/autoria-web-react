@@ -10,35 +10,30 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Buscar cursos — público, sem token
+    // 1️⃣ Buscar cursos públicos (sempre)
     fetch("https://autoria-web-react-production.up.railway.app/api/cursos-publicos")
       .then(res => res.json())
       .then(data => setCursos(Array.isArray(data) ? data : []))
       .catch(() => setCursos([]));
 
-    // Se houver token, buscar perfil
+    // 2️⃣ Buscar perfil apenas se tiver token
     if (token) {
       fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then(res => {
-          if (!res.ok) throw new Error("Token inválido");
-          return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject("Token inválido"))
         .then(data => setUsuario(data))
         .catch(() => localStorage.removeItem("token"))
         .finally(() => setLoading(false));
     } else {
-      setLoading(false);
+      setLoading(false); // 👈 garante que loading termina mesmo sem token
     }
   }, []);
 
+  // Função de matrícula
   function matricular(id) {
     const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Faça login para se matricular!");
-      return;
-    }
+    if (!token) return alert("Faça login para se matricular!");
 
     fetch("https://autoria-web-react-production.up.railway.app/api/matriculas", {
       method: "POST",
@@ -49,10 +44,12 @@ export default function Home() {
       body: JSON.stringify({ id_curso: id })
     })
       .then(res => res.json())
-      .then(() => alert("Matrícula realizada!"));
+      .then(() => alert("Matrícula realizada!"))
+      .catch(() => alert("Erro ao matricular"));
   }
 
-  if (loading) return <p>Carregando...</p>;
+  // 3️⃣ Loading inicial
+  if (loading) return <p>Carregando cursos...</p>;
 
   return (
     <Layout>
@@ -65,6 +62,7 @@ export default function Home() {
       )}
 
       <div className={styles.gridCursos}>
+        {cursos.length === 0 && <p>Nenhum curso disponível no momento.</p>}
         {cursos.map(c => (
           <div key={c.id_curso} className={styles.cursoCard}>
             <h3>{c.titulo}</h3>
