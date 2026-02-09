@@ -348,6 +348,21 @@ app.get("/api/banco-questoes", autenticarJWT, (req, res) => {
   });
 });
 
+app.get("/api/questoes/:tema", autenticarJWT, (req, res) => {
+  const { tema } = req.params;
+
+  const sql = `
+    SELECT * FROM banco_questoes
+    WHERE tema = ?
+  `;
+
+  db.query(sql, [tema], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
+    res.json(results);
+  });
+});
+
+
 
 app.post("/api/respostas", autenticarJWT, (req, res) => {
   const { id_questao, resposta_marcada } = req.body;

@@ -22,8 +22,9 @@ function App() {
       <Route path='/meuscursos' element={<MeusCursos/>} />
       <Route path='/curso/:id' element={<CursoDetalhe/>} />
       <Route path="/criar-curso" element={<CriarCurso />} />
-      <Route path="/questoes/:idTopico" element={<FazerQuestoes />} />
-      <Route path="/criar-questao/:idTopico" element={<CriarQuestao />} />
+      <Route path="/questoes/:tema" element={<FazerQuestoes />} />
+      <Route path="/criar-questao" element={<CriarQuestao />} />
+
     </Routes>
   );
 }
