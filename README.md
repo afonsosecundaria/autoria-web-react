@@ -8,6 +8,182 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 
+# Link da aplicação
+
+- https://autoria-web-react.vercel.app/
+
+# Como executar
+
+- npm run dev
+
+Dependências:
+
+Front end:
+
+- npm install -D tailwindcss postcss autoprefixer
+- npx tailwindcss init -p
+
+Backend:
+
+- npm install node mysql cors express bcrypt
+
+# Banco de dados
+
+O banco de dados cursos_online foi projetado para gerenciar uma plataforma de cursos online com suporte a usuários, cursos, conteúdos, banco de questões e respostas dos alunos. O modelo segue o paradigma relacional, garantindo integridade referencial por meio de chaves primárias e estrangeiras.
+
+🧠 MODELO RELACIONAL (LÓGICO)
+
+O modelo relacional é composto pelas seguintes entidades principais:
+
+👤 USUÁRIOS
+
+Armazena os dados das pessoas que utilizam o sistema, podendo ser alunos ou professores.
+
+Cada usuário possui um identificador único (id_usuario)
+
+Um usuário pode ser do tipo aluno ou professor
+
+Professores podem criar cursos
+
+Alunos podem se matricular em cursos e responder questões
+
+Relacionamentos:
+
+Usuário (professor) → Curso (1:N)
+
+Usuário (aluno) → Matrícula (1:N)
+
+Usuário → Respostas (1:N)
+
+📘 CURSOS
+
+Representa os cursos cadastrados na plataforma.
+
+Cada curso é criado por um professor
+
+Um curso possui vários tópicos
+
+Relacionamentos:
+
+Curso → Tópicos (1:N)
+
+Curso → Matrículas (1:N)
+
+Curso ↔ Questões (N:N, via tabela curso_questoes)
+
+📑 TÓPICOS
+
+Organizam os conteúdos de cada curso.
+
+Cada tópico pertence a um único curso
+
+Um tópico pode possuir vários materiais
+
+Relacionamento:
+
+Tópico → Materiais (1:N)
+
+📂 MATERIAIS
+
+Armazena os conteúdos disponibilizados (PDF, vídeo, etc.).
+
+Cada material está vinculado a um tópico
+
+O tipo do material é controlado por ENUM (pdf, video, outro)
+
+📝 BANCO_DE_QUESTOES
+
+Armazena questões independentes dos cursos, funcionando como um banco geral (similar a sistemas como QConcursos).
+
+Cada questão possui:
+
+Tema
+
+Enunciado
+
+Alternativas
+
+Resposta correta
+
+As questões podem ser reutilizadas em vários cursos
+
+Relacionamentos:
+
+Questão ↔ Curso (N:N)
+
+Questão → Respostas (1:N)
+
+🔗 CURSO_QUESTOES
+
+Tabela associativa responsável por relacionar cursos às questões.
+
+Permite que uma mesma questão seja usada em vários cursos
+
+Permite que um curso tenha várias questões
+
+🧾 MATRÍCULAS
+
+Representa a inscrição de alunos em cursos.
+
+Cada matrícula liga um aluno a um curso
+
+Impede duplicidade de matrícula para o mesmo curso
+
+Relacionamento:
+
+Usuário (aluno) ↔ Curso (N:N)
+
+✅ RESPOSTAS_ALUNO
+
+Armazena as respostas dadas pelos alunos às questões.
+
+Registra:
+
+Qual usuário respondeu
+
+Qual questão foi respondida
+
+Qual alternativa foi marcada
+
+Se a resposta estava correta ou não
+
+Relacionamentos:
+
+Usuário → Respostas (1:N)
+
+Questão → Respostas (1:N)
+
+💾 MODELO FÍSICO (IMPLEMENTAÇÃO EM SQL)
+
+O modelo físico foi implementado no SGBD MySQL com as seguintes características:
+
+Uso de AUTO_INCREMENT para chaves primárias
+
+Uso de FOREIGN KEY para integridade referencial
+
+Uso de ENUM para tipos controlados (tipo_usuario e tipo de material)
+
+Tipos adequados para cada atributo (VARCHAR, TEXT, DATE, BOOLEAN)
+
+Exemplo:
+
+id_usuario, id_curso, id_topico, id_questao → chaves primárias
+
+id_professor, id_curso, id_topico, id_questao → chaves estrangeiras
+
+O banco garante que:
+
+Um curso não exista sem um professor válido
+
+Um tópico não exista sem um curso
+
+Um material não exista sem um tópico
+
+Uma resposta não exista sem uma questão válida
+
+Uma matrícula não exista sem usuário e curso válidos
+
+# Código
 
 CREATE DATABASE cursos_online;
 USE cursos_online;
