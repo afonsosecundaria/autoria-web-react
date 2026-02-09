@@ -8,7 +8,8 @@ export default function FazerQuestoes() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
+    const tema = encodeURIComponent(idTopico);
+    
     fetch(`https://autoria-web-react-production.up.railway.app/api/banco-questoes?tema=${idTopico}`, {
       headers: {
         Authorization: `Bearer ${token}`

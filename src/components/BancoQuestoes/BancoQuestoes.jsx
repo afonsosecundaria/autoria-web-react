@@ -3,31 +3,6 @@ import { useState, useEffect } from "react";
 import Layout from "../Layout/Layout";
 import styles from "./BancoQuestoes.module.css";
 
-const mapaTopicos = {
-  "Conjuntos": 1,
-  "Geometria Plana": 2,
-  "Geometria Espacial": 3,
-  "Geometria Analítica": 4,
-  "Interpretação de Texto": 5,
-  "Ortografia": 6,
-  "Crase": 7,
-  "Concordância": 8,
-  "Windows": 9,
-  "Word": 10,
-  "Excel": 11,
-  "Internet": 12,
-  "Modelo Relacional": 13,
-  "SQL": 14,
-  "Normalização": 15,
-  "OSI": 16,
-  "TCP/IP": 17,
-  "Protocolos": 18,
-  "Cabeamento": 19,
-  "Portas Lógicas": 20,
-  "Flip-Flop": 21,
-  "Circuitos": 22
-};
-
 const dados = {
   Matemática: ["Conjuntos", "Geometria Plana", "Geometria Espacial", "Geometria Analítica"],
   Português: ["Interpretação de Texto", "Ortografia", "Crase", "Concordância"],
