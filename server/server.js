@@ -305,11 +305,24 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
     resposta_correta
   } = req.body;
 
-  if (!id_topico || !enunciado || !alternativa_a || !alternativa_b || !alternativa_c || !alternativa_d || !resposta_correta) {
+  // ✅ validação correta
+  if (
+    !id_topico ||
+    !enunciado ||
+    !alternativa_a ||
+    !alternativa_b ||
+    !alternativa_c ||
+    !alternativa_d ||
+    !resposta_correta
+  ) {
     return res.status(400).json({ error: "Dados incompletos." });
   }
 
-  const sqlUsuario = `SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?`;
+  const sqlUsuario = `
+    SELECT tipo_usuario 
+    FROM usuarios 
+    WHERE id_usuario = ?
+  `;
 
   db.query(sqlUsuario, [req.userId], (err, results) => {
     if (err) {
@@ -331,22 +344,26 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [
-      id_topico,
-      enunciado,
-      alternativa_a,
-      alternativa_b,
-      alternativa_c,
-      alternativa_d,
-      resposta_correta
-    ], (err) => {
-      if (err) {
-        console.error("ERRO INSERT QUESTAO:", err);
-        return res.status(500).json({ error: "Erro ao cadastrar questão." });
-      }
+    db.query(
+      sql,
+      [
+        Number(id_topico), // ✅ garante INT
+        enunciado,
+        alternativa_a,
+        alternativa_b,
+        alternativa_c,
+        alternativa_d,
+        resposta_correta
+      ],
+      (err) => {
+        if (err) {
+          console.error("ERRO INSERT QUESTAO:", err);
+          return res.status(500).json({ error: "Erro ao cadastrar questão." });
+        }
 
-      res.json({ message: "Questão cadastrada com sucesso!" });
-    });
+        res.json({ message: "Questão cadastrada com sucesso!" });
+      }
+    );
   });
 });
 

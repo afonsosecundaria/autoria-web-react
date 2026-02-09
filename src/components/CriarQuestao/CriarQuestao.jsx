@@ -21,6 +21,11 @@ export default function CriarQuestao() {
       return;
     }
 
+    if (!idTopico) {
+      alert("ID do tópico não encontrado.");
+      return;
+    }
+
     try {
       const res = await fetch("https://autoria-web-react-production.up.railway.app/api/questoes", {
         method: "POST",
