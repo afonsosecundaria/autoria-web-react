@@ -342,11 +342,22 @@ app.post("/api/banco-questoes", autenticarJWT, (req, res) => {
 });
 
 app.get("/api/banco-questoes", autenticarJWT, (req, res) => {
-  db.query("SELECT * FROM banco_questoes", (err, results) => {
+  const { tema } = req.query;
+
+  let sql = "SELECT * FROM banco_questoes";
+  let params = [];
+
+  if (tema) {
+    sql += " WHERE tema = ?";
+    params.push(tema);
+  }
+
+  db.query(sql, params, (err, results) => {
     if (err) return res.status(500).json({ error: "Erro no servidor." });
     res.json(results);
   });
 });
+
 
 app.get("/api/questoes/:tema", autenticarJWT, (req, res) => {
   const { tema } = req.params;
