@@ -10,7 +10,7 @@ import CriarCurso from './components/CriarCurso/CriarCurso';
 import CriarQuestao from './components/CriarQuestao/CriarQuestao';
 import FazerQuestoes from './components/FazerQuestoes/FazerQuestoes';
 
-import RotaPrivada from "./RotaPrivada"; // 👈 importe
+import RotaPrivada from "./components/RotaPrivada/RotaPrivada"; // 👈 importe
 
 function App() {
   return (
