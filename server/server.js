@@ -305,7 +305,6 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
     resposta_correta
   } = req.body;
 
-  // ✅ validação correta
   if (
     !id_topico ||
     !enunciado ||
@@ -318,17 +317,10 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
     return res.status(400).json({ error: "Dados incompletos." });
   }
 
-  const sqlUsuario = `
-    SELECT tipo_usuario 
-    FROM usuarios 
-    WHERE id_usuario = ?
-  `;
+  const sqlUsuario = "SELECT tipo_usuario FROM usuarios WHERE id_usuario = ?";
 
   db.query(sqlUsuario, [req.userId], (err, results) => {
-    if (err) {
-      console.error("ERRO SQL USUÁRIO:", err);
-      return res.status(500).json({ error: "Erro no servidor." });
-    }
+    if (err) return res.status(500).json({ error: "Erro no servidor." });
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Usuário não encontrado." });
@@ -347,7 +339,7 @@ app.post("/api/questoes", autenticarJWT, (req, res) => {
     db.query(
       sql,
       [
-        Number(id_topico), // ✅ garante INT
+        Number(id_topico), // 🔥 CORREÇÃO
         enunciado,
         alternativa_a,
         alternativa_b,
