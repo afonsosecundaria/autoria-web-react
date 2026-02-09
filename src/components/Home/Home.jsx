@@ -7,36 +7,36 @@ export default function Home() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-  
-    if (!token) {
-      // usuário não logado → manda pro login
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    // usuário não logado → manda pro login
+    window.location.href = "/";
+    return;
+  }
+
+  fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Token inválido");
+      return res.json();
+    })
+    .then(data => setUsuario(data))
+    .catch(() => {
+      localStorage.removeItem("token");
       window.location.href = "/";
-      return;
-    }
-  
-    fetch("https://autoria-web-react-production.up.railway.app/api/perfil", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Token inválido");
-        return res.json();
-      })
-      .then(data => setUsuario(data))
-      .catch(() => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      });
-  
-    fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => setCursos(Array.isArray(data) ? data : []))
-      .catch(() => setCursos([]));
-  
-  }, []);
-  
+    });
+
+  fetch("https://autoria-web-react-production.up.railway.app/api/cursos", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => setCursos(Array.isArray(data) ? data : []))
+    .catch(() => setCursos([]));
+
+}, []);
+
   
 
 
